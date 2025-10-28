@@ -14,23 +14,23 @@ jobs:
       # 1. Checkout del código
       - name: Checkout code
         uses: actions/checkout@v4
-
+        
       # 2. Paso CRÍTICO de empaquetado para PHP (SAST)
       - name: Compress PHP Source Code for Veracode SAST
         run: zip -r dvwa.zip .
-
-      # 3. Veracode Upload and Scan (SAST)
+        
+      # 3. Veracode Upload and Scan (SAST) - ¡VERSIÓN CORREGIDA!
       - name: Veracode Static Analysis Upload and Scan
-        uses: veracode/uploadandscan-action@v0.0.9 # Usa la versión más reciente
+        uses: veracode/uploadandscan-action@v0 # Corregido: usando v0 en lugar de v0.0.9
         with:
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
           file: 'dvwa.zip'
           appname: 'DVWA-${{ github.repository }}'
           version: ${{ github.sha }}
-
-      # 4. Veracode SCA Scan (Agent-Based)
+          
+      # 4. Veracode SCA Scan (Agent-Based) - ¡VERSIÓN CORREGIDA!
       - name: Veracode SCA Scan (Agent-Based)
-        uses: veracode/veracode-sca@v1.1.0 # Usa la versión más reciente
+        uses: veracode/veracode-sca@v1 # Corregido: usando v1 en lugar de v1.1.0
         with:
           srccodereviewer_api_token: ${{ secrets.SRCCLR_API_TOKEN }}
