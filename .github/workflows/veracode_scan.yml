@@ -1,0 +1,36 @@
+# Ejemplo de código para evaluar como plantilla:
+name: Veracode Static Analysis( & SCA optional ) POC (DVWA - PHP)
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  veracode_scan:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checkout del código
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Paso CRÍTICO de empaquetado para PHP (SAST)
+      - name: Compress PHP Source Code for Veracode SAST
+        run: zip -r dvwa.zip .
+
+      # 3. Veracode Upload and Scan (SAST)
+      - name: Veracode Static Analysis Upload and Scan
+        uses: veracode/uploadandscan-action@v0.0.9 # Usa la versión más reciente
+        with:
+          vid: ${{ secrets.VERACODE_API_ID }}
+          vkey: ${{ secrets.VERACODE_API_KEY }}
+          file: 'dvwa.zip'
+          appname: 'DVWA-${{ github.repository }}'
+          version: ${{ github.sha }}
+
+      # 4. Veracode SCA Scan (Agent-Based)
+      - name: Veracode SCA Scan (Agent-Based)
+        uses: veracode/veracode-sca@v1.1.0 # Usa la versión más reciente
+        with:
+          srccodereviewer_api_token: ${{ secrets.SRCCLR_API_TOKEN }}
