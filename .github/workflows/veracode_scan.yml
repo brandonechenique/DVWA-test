@@ -1,6 +1,7 @@
 # Ejemplo de código para evaluar como plantilla:
 name: Veracode Static Analysis( & SCA optional ) POC (DVWA - PHP)
 
+# El flujo de trabajo se ejecuta en los eventos push y pull_request a la rama master
 on:
   push:
     branches: [ master ]
@@ -8,29 +9,38 @@ on:
     branches: [ master ]
 
 jobs:
-  veracode_scan:
+  veracode_sast_scan:
+    # Este trabajo se ejecuta en el runner de Ubuntu más reciente
     runs-on: ubuntu-latest
+    
     steps:
       # 1. Checkout del código
+      # Baja el código del repositorio para que esté disponible para el runner
       - name: Checkout code
         uses: actions/checkout@v4
         
-      # 2. Paso CRÍTICO de empaquetado para PHP (SAST)
+      # 2. Paso CRÍTICO de empaquetado para PHP (Requisito de SAST)
+      # Comprime el código fuente en un archivo ZIP para que Veracode pueda procesarlo.
       - name: Compress PHP Source Code for Veracode SAST
-        run: zip -r dvwa.zip .
+        run: zip -r dvwa_sast.zip .
         
-      # 3. Veracode Upload and Scan (SAST) - ¡VERSIÓN CORREGIDA!
+      # 3. Veracode Upload and Scan (SAST)
+      # Utiliza la acción de carga y escaneo. Usa el tag principal (@v0) para la última versión estable.
       - name: Veracode Static Analysis Upload and Scan
-        uses: veracode/uploadandscan-action@v0 # Corregido: usando v0 en lugar de v0.0.9
+        uses: veracode/uploadandscan-action@v0 # Se corrigió el tag de la versión
         with:
+          # Las credenciales se obtienen de los Secrets que debes haber creado
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
-          file: 'dvwa.zip'
-          appname: 'DVWA-${{ github.repository }}'
-          version: ${{ github.sha }}
           
-      # 4. Veracode SCA Scan (Agent-Based) - ¡VERSIÓN CORREGIDA!
-      - name: Veracode SCA Scan (Agent-Based)
-        uses: veracode/veracode-sca@v1 # Corregido: usando v1 en lugar de v1.1.0
-        with:
-          srccodereviewer_api_token: ${{ secrets.SRCCLR_API_TOKEN }}
+          # Archivo a subir
+          file: 'dvwa_sast.zip'
+          
+          # Configuración de la aplicación en la Plataforma Veracode
+          appname: 'DVWA-TEST-${{ github.repository }}' # Nombre para la aplicación en Veracode
+          version: ${{ github.sha }} # Usa el hash del commit como versión del escaneo
+          
+          # Opciones de escaneo (puedes descomentar para un escaneo más rápido)
+          # scan_name: 'SAST Pipeline Scan' # Opcional: Nombre visible para el escaneo
+          # action: 'Prescan' # Opcional: Solo hace un Prescan para validar si el empaquetado es correcto
+          # policy_scan: 'true' # Opcional: Activa el escaneo completo contra la política de seguridad (toma más tiempo)
