@@ -1,7 +1,7 @@
 <?php
 
 define( 'DVWA_WEB_PAGE_TO_ROOT', '' );
-require_once DVWA_WEB_PAGE_TO_ROOT . 'dvwa/includes/dvwaPage.inc.php';
+require_once DVWA_WEB_PAGE_TO_ROOT . 'dvwa/includes/dvwaPage.inc.php'; 
 
 dvwaPageStartup( array( ) );
 
@@ -33,7 +33,7 @@ if( isset( $_POST[ 'create_db' ] ) ) {
 	}
 }
 
-// Anti-CSRF
+// Anti-CSRF anti
 generateSessionToken();
 
 $database_type_name = "Unknown - The site is probably now broken";
@@ -154,3 +154,4 @@ allow_url_include = On</code></pre>
 dvwaHtmlEcho( $page );
 
 ?>
+
