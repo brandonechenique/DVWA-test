@@ -27,7 +27,7 @@ jobs:
       # 3. Veracode Upload and Scan (SAST)
       # Utiliza la acción de carga y escaneo. Usa el tag principal (@v0) para la última versión estable.
       - name: Veracode Static Analysis Upload and Scan
-        uses: veracode/uploadandscan-action@v0 # Se corrigió el tag de la versión
+        uses: veracode/uploadandscan-action@v0.1.8 # Se corrigió el tag de la versión
         with:
           # Las credenciales se obtienen de los Secrets que debes haber creado
           vid: ${{ secrets.VERACODE_API_ID }}
